@@ -1,0 +1,145 @@
+#ifndef GETNODETEGRANANO_H
+#define GETNODETEGRANANO_H
+
+#include <sys/ioctl.h>
+#include <string>
+#include <vector>
+
+/*
+ * This class represents the interface to the virtual file system to get information from the Odroid sensors (current, voltage power. temperature and utilization).
+ * This code has been taken (and slightly readapted) from the Odroid EnergyMonitor
+ */
+
+
+#define SENSOR_IN_W  "/sys/bus/i2c/drivers/ina3221x/6-0040/iio:device0/in_power0_input"
+#define SENSOR_IN_A  "/sys/bus/i2c/drivers/ina3221x/6-0040/iio:device0/in_current0_input"
+#define SENSOR_IN_V  "/sys/bus/i2c/drivers/ina3221x/6-0040/iio:device0/in_voltage0_input"
+
+#define SENSOR_GPU_W  "/sys/bus/i2c/drivers/ina3221x/6-0040/iio:device0/in_power1_input"
+#define SENSOR_GPU_A  "/sys/bus/i2c/drivers/ina3221x/6-0040/iio:device0/in_current1_input"
+#define SENSOR_GPU_V  "/sys/bus/i2c/drivers/ina3221x/6-0040/iio:device0/in_voltage1_input"
+
+#define SENSOR_CPU_W "/sys/bus/i2c/drivers/ina3221x/6-0040/iio:device0/in_power2_input"
+#define SENSOR_CPU_A "/sys/bus/i2c/drivers/ina3221x/6-0040/iio:device0/in_current2_input"
+#define SENSOR_CPU_V "/sys/bus/i2c/drivers/ina3221x/6-0040/iio:device0/in_voltage2_input"
+
+#define TEGRA_NUM_OF_CPU_CORES 4
+
+#define TEGRA_LITTLE_CORE_ID 1
+#define TEGRA_LITTLE_MAX_FREQ 1479000
+#define TEGRA_LITTLE_MIN_FREQ 102000
+//#define TEGRA_LITTLE_REF_FREQ 1420800
+
+#define AUTO_CPU_FREQ_SCALING "/sys/module/qos/parameters/enable"
+
+#define CPU_PATH "/sys/devices/system/cpu/cpu"
+#define CPU_CURR_STATUS "/online"
+#define CPU_CURR_FREQ "/cpufreq/cpuinfo_cur_freq"
+#define CPU_CURR_SCAL_FREQ "/cpufreq/scaling_cur_freq"
+#define CPU_SET_FREQ_MAX "/cpufreq/scaling_max_freq"
+#define CPU_SET_FREQ_MIN "/cpufreq/scaling_min_freq"
+#define CPU_FREQ_SCALING_GOV "/cpufreq/scaling_governor"
+#define CPU_AVAILABLE_FREQS "/cpufreq/scaling_available_frequencies"
+#define PERFORMANCE_GOVERNOR "performance"
+#define SCHEDUTIL_GOVERNOR "schedutil"
+#define NVPMODEL_M0 "sudo nvpmodel -m 0"
+
+#define MEM_CURR_FREQ "/sys/kernel/debug/clk/emc/clk_rate"
+
+#define GPU_CURR_FREQ "/sys/devices/57000000.gpu/devfreq/57000000.gpu/cur_freq"
+#define GPU_AVAILABLE_FREQS "/sys/devices/57000000.gpu/devfreq/57000000.gpu/available_frequencies"
+
+#define POW_WINDOW_SIZE 6
+
+
+class GetNode_TegraNano {
+public:
+  //Constructor and Destructor
+  GetNode_TegraNano();
+  ~GetNode_TegraNano();
+
+  //getters for status, frequency and temperature
+  bool isAutoCPUFreqScaling();
+  bool isCPUActive(int cpuNum);
+  //DO NOTE: there are two different getters for the CPU freq since the actual one (getCPUCurFreq) use to oscillate. 
+  //so with the second getter (getCPUCurScalFreq) it is possible to check which is the value that was set
+  int getCPUCurFreq(int cpuNum);
+  int getCPUCurScalFreq(int cpuNum);
+  int getGPUCurFreq();
+  int getMemCurFreq();
+  std::vector<int> getAvailableCPUFreq(int cpuNum);
+  std::vector<int> getAvailableGPUFreq();
+  std::vector<int> getAvailableMemFreq();
+//  int getCPUTemp(int cpuNum);
+
+  //setters for status and frequency
+  void setAutoCPUFreqScaling(bool status);  
+  void setCPUActive(int cpuNum, bool status);
+  void setCPUFreq(int cpuNum, int freq);  
+  void setGPUFreq(int freq);
+  void setMemFreq(int freq);
+  
+  //get fan speed
+  int getFanSpeed();
+  void setFanSpeed(int pwm);
+  int getFanStepTime();
+  void resetFanStepTime();
+  void setFanStepTime(int time);
+
+  //getter for current, voltage and power consumption
+  float getGpuV();
+  float getGpuA();
+  float getGpuW();
+  float getVddInV();
+  float getVddInA();
+  float getVddInW();
+  float getCpuV();
+  float getCpuA();
+  float getCpuW();
+  
+  //getters for average power consumption on a sliding window of POW_WINDOW_SIZE samples
+  float getGpuWavg();
+  float getVddInWavg();
+  float getCpuWavg();
+  
+  //getters of the (average) power consumption of the overall chip/board //TODO board
+  float getChipW();
+  float getChipWavg();
+  
+  void updateSensing(); //PAY ATTENTION: this function has to be called to update sensed data. therefore BEFORE using above getters
+
+//  float estimate_power(std::vector<int> utils, int bigFreq, int littleFreq);
+
+private:
+  //helper attribute
+  std::string cpu_online_list[TEGRA_NUM_OF_CPU_CORES];
+  std::string cpu_freq_list[TEGRA_NUM_OF_CPU_CORES];
+  std::string cpu_scal_freq_list[TEGRA_NUM_OF_CPU_CORES];
+  std::string cpu_avail_freq_list[TEGRA_NUM_OF_CPU_CORES];
+  std::string cpu_freq_gov_list[TEGRA_NUM_OF_CPU_CORES];
+  std::string cpu_set_freq_max_list[TEGRA_NUM_OF_CPU_CORES];
+  std::string cpu_set_freq_min_list[TEGRA_NUM_OF_CPU_CORES];
+
+  //variables where last read is stored
+  float gpuV, gpuA, gpuW;
+  float vddInV, vddInA, vddInW;
+  float cpuV, cpuA, cpuW;
+  
+  //sum of last POW_WINDOW_SIZE samples
+  float gpuWs, vddInWs, cpuWs;
+
+  //Attributes used to compute the mean power consumption of the last POW_WINDOW_SIZE periodic invocations of updateWavg() function
+  //array of last POW_WINDOW_SIZE samples
+  float gpuWavg[POW_WINDOW_SIZE];
+  float vddInWavg[POW_WINDOW_SIZE];
+  float cpuWavg[POW_WINDOW_SIZE];
+
+  //index of the next position of the above arrays to be written
+  int slidingIndex;
+
+  //manage sensor drivers
+  float read_sensor(const char *node);
+  void update_read();
+};
+
+#endif // GETNODE_H

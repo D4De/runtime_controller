@@ -49,7 +49,7 @@ To run a very simple demo with a controller monitoring the system status:
 a. start the controller:
 ```
 cd basic_controller
-sudo ./controller -p 1
+sudo ./controller -p 0
 ```
 
 b. start one of the applications:
@@ -61,7 +61,7 @@ cd sha
 Actually the demo just only monitors the status of the system (application performance and system status). To kill it, it is sufficient to kill only the controller with ``ctrl+c``. 
 
 
-## Examples
+## A more advanced version of the controller
 
 In the ``controller`` folder there is a more advanced version of the controller targeted for Nvidia Jetson Nano board. This version demonstrates how to interact with hardware sensors and knobs and integrates an example of resource management policy.
 

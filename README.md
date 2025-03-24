@@ -71,6 +71,6 @@ Refer to the ``README`` file within the folder for advanced details on the featu
 
 ## A previous version of the controller
 
-In the ``previous_controller`` folder there is a more advanced version of the controller deployed on multiple boards: Hardkernel Odroid XU3/XU4 (optionally connected to the Hardkernel SmartPower1), NVIDIA Jetson TX2, NVIDIA Jetson Nano, Raspberry PI4. AS the ``orin_controller``, this version demonstrates how to interact with hardware sensors and knobs of the various boards and integrates an example of resource management policy. The project can be compiled and executed in the same way of the basic version. Option ``-h`` can be used to see all possible alternative configurations of the policy. 
+In the ``previous_controller`` folder there is a more advanced version of the controller deployed on multiple boards: Hardkernel Odroid XU3/XU4 (optionally connected to the Hardkernel SmartPower1), NVIDIA Jetson TX2, NVIDIA Jetson Nano, Raspberry PI4. As the ``orin_controller``, this version demonstrates how to interact with hardware sensors and knobs of the various boards and integrates an example of resource management policy. The project can be compiled and executed in the same way of the basic version. Option ``-h`` can be used to see all possible alternative configurations of the policy. 
 The code is not maintained any more. 
 

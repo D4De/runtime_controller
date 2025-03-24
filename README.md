@@ -1,4 +1,4 @@
- # Runtime Resource Controller
+# Runtime Resource Controller
 This project implements a runtime resource management framework for multicores running a multiprogrammed workload working on Linux, capable of monitoring system status (both running applications attached to the controller and hardware parameters) and actuating on available hardware and software knobs to optimize a given objective function. Indeed the controller here implemented is a skeleton and has to be customized with the desired decision policy and extended to support actual sensors and knobs available on the target architecture; also, software knob control has to be implemented based on the necessities of the working scenario.
 
 For a methodological description of the controller, please refer to:
@@ -60,9 +60,17 @@ cd sha
 
 Actually the demo just only monitors the status of the system (application performance and system status). To kill it, it is sufficient to kill only the controller with ``ctrl+c``. 
 
+## An advanced version of the controller
+In the ``orin_controller`` folder there is a more advanced version of the controller deployed on the NVIDIA Jetson Orin NX board. This version demonstrates how to interact with hardware sensors and knobs of the various boards and integrates an example of resource management policy. The project can be compiled and executed in the same way of the basic version. Option ``-h`` can be used to see all possible alternative configurations of the policy. The ``sha`` application requires also the required throughput to be specified:
+```
+cd sha
+./sha input_large.asc 10000 30
+```
 
-## A more advanced version of the controller
+Refer to the ``README`` file within the folder for advanced details on the features demonstrated in the code.
 
-In the ``controller`` folder there is a more advanced version of the controller targeted for Nvidia Jetson Nano board. This version demonstrates how to interact with hardware sensors and knobs and integrates an example of resource management policy.
+## A previous version of the controller
 
+In the ``previous_controller`` folder there is a more advanced version of the controller deployed on multiple boards: Hardkernel Odroid XU3/XU4 (optionally connected to the Hardkernel SmartPower1), NVIDIA Jetson TX2, NVIDIA Jetson Nano, Raspberry PI4. AS the ``orin_controller``, this version demonstrates how to interact with hardware sensors and knobs of the various boards and integrates an example of resource management policy. The project can be compiled and executed in the same way of the basic version. Option ``-h`` can be used to see all possible alternative configurations of the policy. 
+The code is not maintained any more. 
 

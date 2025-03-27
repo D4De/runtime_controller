@@ -25,23 +25,26 @@ int main(int argc, char **argv)
     char* filename;
     double req_thr = 0;
     bool curr_gpu, prec_gpu = false;
+    bool change_thr = false;
 
-    if(argc <= 2 || argc > 5){
-        printf("Usage: %s <IN_FILE_NAME> <NUM_OF_ITERS> [REQ_THR] \n", argv[0]);
+    if(argc <= 2 || argc > 6){
+        printf("Usage: %s <IN_FILE_NAME> <NUM_OF_ITERS> [REQ_THR] [THR_CHANGE=Y] \n", argv[0]);
         return -1;
     }
     times = std::atoi(argv[2]);
     if (times < 0){
-      std::cout << "negative times value " << times << std::endl;
-      exit(0);
+        std::cout << "negative times value " << times << std::endl;
+        exit(0);
     }
     filename = argv[1];
-    if (argc == 4){
+    if (argc >= 4){
         req_thr = std::atof(argv[3]);
         if (req_thr < 0){
-          std::cout << "negative throughput " << req_thr << std::endl;
-          exit(0);
+            std::cout << "negative throughput " << req_thr << std::endl;
+            exit(0);
         }
+        if (argc == 5)
+            change_thr = true;
     }
     
     //attach the monitor. parameters are: application name, required throughput, a flag for 
@@ -73,10 +76,10 @@ int main(int argc, char **argv)
         } else {
             printf("error opening %s for reading\n", filename);
         }
-        // here an example of throughput changes signaled to the controller. 
+        // here an example of throughput changes signaled to the controller (if enabled). 
         // similarly it is possible to receive infos (e.g. run on gpu) from the controller 
         // (the code for input infos has to be put at the beginning of the loop)
-        if(i==THR_REQ_CHANGE_TIME){
+        if(change_thr && i==THR_REQ_CHANGE_TIME){
           std::cout << "CHANGE THROUGHPUT (communicate to the controller)" << std::endl;
           req_thr = req_thr/2;
           setReqThroughput(data, req_thr);

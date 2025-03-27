@@ -66,6 +66,7 @@ In the ``orin_controller`` folder there is a more advanced version of the contro
 cd sha
 ./sha input_large.asc 10000 30
 ```
+Optionally, it is possible to specify ``y`` as one more parameter to enable a change in the throughput requirement.
 
 Refer to the ``README`` file within the folder for advanced details on the features demonstrated in the code.
 
